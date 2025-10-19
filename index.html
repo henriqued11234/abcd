@@ -3,57 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Testar Relatório</title>
 </head>
 <body>
     <script>
-        function logPerson() {
-          // fetch('http://localhost:8080/myresource/buscar', {
-            fetch('http://localhost:8080/myresource/post', {
-         // fetch('http://localhost:8080/myresource/atualiza?1&atualiza', {
-                method: "POST",
-                body: JSON.stringify({ 
-                    id: 50, 
-                    nome: "ABCagoraa", 
-                    cpf: "1233322", 
-                    senha: "asdssdasdaf2" 
-                }),
+        function testRelatorio() {
+            fetch('http://localhost:8080/hello/relatorio', {
+                method: "GET",
                 headers: {
-                    'Content-Type': 'application/json' // Indicate that the body is JSON
-               }
+                    'Content-Type': 'application/json'
+                }
             })
             .then(function (response) {
-                // Check if the response is okay
                 if (!response.ok) {
-                    throw new Error('Erro na resposta da requisição: ' + response.statusText);
+                    throw new Error('Erro na resposta: ' + response.statusText);
                 }
                 
-                // Check if the response is JSON
                 const contentType = response.headers.get("Content-Type");
                 if (contentType && contentType.includes("application/json")) {
-                    return response.json(); // Parse response as JSON
-                }
-              if (contentType && contentType.includes("text/plain"))
-                {
-                  return response.text(); 
-                }
-              else {
-                    
+                    return response.json();
+                } else {
                     throw new Error('Resposta não é JSON: ' + contentType);
                 }
             })
-            .then(function (myJson) {
-                console.log(myJson); // Log the JSON response to the console
-                document.getElementById("textoHtml").innerHTML = JSON.stringify(myJson, null); // Display response in HTML
+            .then(function (data) {
+                console.log('Relatório:', data);
+                document.getElementById("resultado").innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
             })
             .catch(function (error) {
-                console.error('Erro: ', error); // Log any errors
-                document.getElementById("textoHtml").innerHTML = 'Error: ' + error.message; // Display error in HTML
+                console.error('Erro:', error);
+                document.getElementById("resultado").innerHTML = 
+                    'Erro: ' + error.message;
             });
         }
+
+        // Teste automático ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            testRelatorio();
+        });
     </script>
-    <button onclick="logPerson()">Log Person</button>
-  
-    <p id="textoHtml"></p>
+
+    <h1>Teste do Relatório de Alunos</h1>
+    <button onclick="testRelatorio()">Carregar Relatório</button>
+    <div id="resultado" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
 </body>
 </html>
