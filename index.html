@@ -1,51 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testar Relatório</title>
+    <title>Teste Endpoints Alunos</title>
 </head>
 <body>
+    <h1>Teste dos Endpoints</h1>
+    
+    <!-- Teste Relatório -->
+    <div>
+        <h2>1. Relatório de Alunos</h2>
+        <button onclick="testRelatorio()">Testar Relatório (GET)</button>
+    </div>
+    
+    <!-- Teste Cadastrar -->
+    <div>
+        <h2>2. Cadastrar Aluno</h2>
+        <input type="text" id="nome" placeholder="Nome">
+        <input type="email" id="email" placeholder="Email">
+        <button onclick="testCadastrar()">Testar Cadastro (POST)</button>
+    </div>
+    
+    <!-- Teste Atualizar -->
+    <div>
+        <h2>3. Atualizar Aluno</h2>
+        <input type="number" id="idAtualizar" placeholder="ID">
+        <input type="text" id="novoNome" placeholder="Novo Nome">
+        <button onclick="testAtualizar()">Testar Atualização (PUT)</button>
+    </div>
+    
+    <!-- Teste Deletar -->
+    <div>
+        <h2>4. Deletar Aluno</h2>
+        <input type="number" id="idDeletar" placeholder="ID">
+        <button onclick="testDeletar()">Testar Deleção (DELETE)</button>
+    </div>
+    
+    <div id="resultado" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;"></div>
+
     <script>
-        function testRelatorio() {
-            fetch('https://exemploaularender2.onrender.com/hello/relatorio', {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(function (response) {
-                if (!response.ok) {
-                    throw new Error('Erro na resposta: ' + response.statusText);
-                }
-                
-                const contentType = response.headers.get("Content-Type");
-                if (contentType && contentType.includes("application/json")) {
-                    return response.json();
-                } else {
-                    throw new Error('Resposta não é JSON: ' + contentType);
-                }
-            })
-            .then(function (data) {
-                console.log('Relatório:', data);
-                document.getElementById("resultado").innerHTML = 
-                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-            })
-            .catch(function (error) {
-                console.error('Erro:', error);
-                document.getElementById("resultado").innerHTML = 
-                    'Erro: ' + error.message;
-            });
+        const BASE_URL = 'https://exemploaularender2.onrender.com/hello';
+        
+        // Função para mostrar resultado
+        function mostrarResultado(mensagem) {
+            document.getElementById('resultado').innerHTML = mensagem;
         }
-
-       /* // Teste automático ao carregar a página
-        document.addEventListener('DOMContentLoaded', function() {
-            testRelatorio();
-        });*/
+        
+        // 1. Teste Relatório (GET)
+        async function testRelatorio() {
+            mostrarResultado('Carregando relatório...');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/relatorio`);
+                const data = await response.json();
+                mostrarResultado('<strong>Relatório (GET):</strong><br>' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                mostrarResultado('Erro: ' + error.message);
+            }
+        }
+        
+        // 2. Teste Cadastrar (POST)
+        async function testCadastrar() {
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            
+            if (!nome || !email) {
+                mostrarResultado('Preencha nome e email');
+                return;
+            }
+            
+            mostrarResultado('Cadastrando...');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/cadastrar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nome: nome,
+                        email: email
+                    })
+                });
+                
+                const resultado = await response.text();
+                mostrarResultado('<strong>Cadastro (POST):</strong><br>' + resultado);
+            } catch (error) {
+                mostrarResultado('Erro: ' + error.message);
+            }
+        }
+        
+        // 3. Teste Atualizar (PUT)
+        async function testAtualizar() {
+            const id = document.getElementById('idAtualizar').value;
+            const novoNome = document.getElementById('novoNome').value;
+            
+            if (!id || !novoNome) {
+                mostrarResultado('Preencha ID e novo nome');
+                return;
+            }
+            
+            mostrarResultado('Atualizando...');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/atualizar/${id}/${novoNome}`, {
+                    method: 'PUT'
+                });
+                
+                const resultado = await response.text();
+                mostrarResultado('<strong>Atualização (PUT):</strong><br>' + resultado);
+            } catch (error) {
+                mostrarResultado('Erro: ' + error.message);
+            }
+        }
+        
+        // 4. Teste Deletar (DELETE)
+        async function testDeletar() {
+            const id = document.getElementById('idDeletar').value;
+            
+            if (!id) {
+                mostrarResultado('Preencha o ID');
+                return;
+            }
+            
+            mostrarResultado('Deletando...');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/deletar/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const resultado = await response.text();
+                mostrarResultado('<strong>Deleção (DELETE):</strong><br>' + resultado);
+            } catch (error) {
+                mostrarResultado('Erro: ' + error.message);
+            }
+        }
     </script>
-
-    <h1>Teste do Relatório de Alunos</h1>
-    <button onclick="testRelatorio()">Carregar Relatório</button>
-    <div id="resultado" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
 </body>
 </html>
